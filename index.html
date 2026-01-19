@@ -233,6 +233,8 @@
       margin: 0;
       font-size: 0.98rem;
       line-height: 1.35;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
     .menu-price-small{
       margin: 0.25rem 0 0;
@@ -308,28 +310,6 @@
       color: var(--accent);
       margin-bottom: 0.6rem;
     }
-
-    .modal-media{
-      margin: 0.6rem 0 0.75rem;
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 14px;
-      overflow: hidden;
-      background: rgba(255,255,255,.06);
-      display: none;
-    }
-    .modal-media.is-show{ display: block; }
-    #modal-img{
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-      display: block;
-    }
-    .modal-allergen{
-      font-size: 0.88rem;
-      color: var(--muted);
-      margin-bottom: 0.6rem;
-      white-space: pre-line;
-    }
     .modal-desc{
       font-size: 0.92rem;
       margin-bottom: 0.6rem;
@@ -377,6 +357,24 @@
 
     @media (min-width: 800px){
       .menu-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    /* ---- Mobile: 1 column + image on top, text below ---- */
+    @media (max-width: 560px){
+      .menu-grid{ grid-template-columns: 1fr; }
+      /* Signature should always be single column and prominent */
+      #signature-root.menu-grid{ grid-template-columns: 1fr; }
+
+      .menu-item{
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+        padding: 0.95rem;
+      }
+      .thumb{
+        width: 100%;
+        height: 160px;
+      }
+      .menu-price-small{ margin-top: 0.35rem; }
     }
     @media (max-width: 640px){
       .page-header-inner{ flex-direction: column; align-items: center; }
@@ -470,13 +468,7 @@
       <button class="modal-close" type="button" aria-label="Close">&times;</button>
       <h3 class="modal-title" id="modal-title"></h3>
       <p class="modal-price" id="modal-price"></p>
-
-      <div class="modal-media" id="modal-media" aria-hidden="true">
-        <img id="modal-img" alt="" />
-      </div>
-
       <p class="modal-desc" id="modal-desc"></p>
-      <p class="modal-allergen" id="modal-allergen"></p>
       <p class="modal-pairing" id="modal-pairing"></p>
     </div>
   </div>
@@ -494,69 +486,7 @@
     // =====================================================
     const CSV_FILE = "cooking_menu_list_tsct.csv"; // <- 同じ階層
     const IMAGES_DIR = "images"; // <- 同じ階層の images/
-    const IMAGE_EXTS = ["png","PNG","jpg","JPG","jpeg","JPEG","webp","WEBP"];
-
-    function uniq(arr){
-      const out=[]; const seen=new Set();
-      for(const x of arr){
-        const k=String(x);
-        if(!k) continue;
-        if(seen.has(k)) continue;
-        seen.add(k);
-        out.push(k);
-      }
-      return out;
-    }
-
-    function slugify(name){
-      // Python側のslugifyに近い挙動（NFKC→空白を-→記号を削除）
-      let s = String(name || "").trim();
-      try { s = s.normalize("NFKC"); } catch(e) {}
-      s = s.replace(/\s+/g, "-");
-      s = s.replace(/[^\w\-ぁ-んァ-ン一-龥]/g, "");
-      return s || "item";
-    }
-
-    function buildNameVariants(name){
-      const raw = String(name || "").trim();
-      let nfkc = raw;
-      try { nfkc = raw.normalize("NFKC"); } catch(e) {}
-      const noSpace = nfkc.replace(/\s+/g, "");
-      const slug = slugify(nfkc);
-      return uniq([raw, nfkc, noSpace, slug]);
-    }
-
-    function guessImageCandidatesSmart(menuName){
-      const vars = buildNameVariants(menuName);
-      const out=[];
-      for(const v of vars){
-        for(const ext of IMAGE_EXTS){
-          out.push(`images/${encodeURIComponent(v)}.${ext}`);
-        }
-      }
-      // food- prefix（slug優先）
-      const slug = slugify(menuName);
-      for(const ext of IMAGE_EXTS){
-        out.push(`images/${encodeURIComponent('food-'+slug)}.${ext}`);
-      }
-      return uniq(out);
-    }
-
-    function tryLoadImage(imgEl, candidates, onDone){
-      let i=0;
-      function next(){
-        if(i>=candidates.length){
-          onDone(false, "");
-          return;
-        }
-        const src=candidates[i++];
-        imgEl.onload = () => onDone(true, src);
-        imgEl.onerror = () => next();
-        imgEl.src = src;
-      }
-      next();
-    }
- // 探す拡張子順
+    const IMAGE_EXTS = ["png", "jpg", "jpeg", "webp"]; // 探す拡張子順
 
     // CSV columns (JP / EN)
     const COL = {
@@ -690,24 +620,37 @@
       const wrap = document.createElement("div");
       wrap.className = "thumb";
 
-      const cand = guessImageCandidatesSmart(menuName);
       const img = document.createElement("img");
-      img.alt = "";
-      img.loading = "lazy";
+      img.alt = menuName;
 
-      // 候補を順に試す（ヒットしたらそれを表示）
-      tryLoadImage(img, cand, (ok, src) => {
-        if(ok){
-          wrap.innerHTML = "";
-          wrap.appendChild(img);
-        }else{
+      const candidates = [];
+      // user expectation: images/{メニュー名}.png
+      for (const ext of IMAGE_EXTS){
+        candidates.push(`${IMAGES_DIR}/${encodeURIComponent(menuName)}.${ext}`);
+      }
+      // additional: food- prefix (optional)
+      for (const ext of IMAGE_EXTS){
+        candidates.push(`${IMAGES_DIR}/food-${encodeURIComponent(menuName)}.${ext}`);
+      }
+
+      let idx = 0;
+      const tryNext = () => {
+        if (idx >= candidates.length){
+          // fallback text
           wrap.textContent = "No Image";
+          return;
         }
-      });
+        img.src = candidates[idx++];
+      };
 
-      // 先にプレースホルダを入れておく
-      wrap.textContent = "";
-      wrap.appendChild(img);
+      img.onerror = () => tryNext();
+      img.onload = () => {
+        // ok
+        wrap.textContent = "";
+        wrap.appendChild(img);
+      };
+
+      tryNext();
       return wrap;
     }
 
@@ -728,6 +671,7 @@
       card.appendChild(thumb);
 
       const right = document.createElement("div");
+      right.className = "menu-text";
 
       const nameP = document.createElement("p");
       nameP.className = "menu-name";
@@ -745,7 +689,6 @@
 
       // dataset for modal
       card.dataset.name = item.name;
-      card.dataset.imgkey = item.nameForImage || "";
       card.dataset.price = item.priceText || "";
       card.dataset.desc = item.desc || "";
       card.dataset.pairing = item.pairing || "";
@@ -782,9 +725,6 @@
       const priceEl = document.getElementById("modal-price");
       const descEl = document.getElementById("modal-desc");
       const pairingEl = document.getElementById("modal-pairing");
-      const allergenEl = document.getElementById("modal-allergen");
-      const mediaEl = document.getElementById("modal-media");
-      const modalImg = document.getElementById("modal-img");
       const closeBtn = modal.querySelector(".modal-close");
 
       function openModal(el){
@@ -793,38 +733,20 @@
         const desc = el.dataset.desc || "";
         const pairing = el.dataset.pairing || "";
         const allergen = el.dataset.allergen || "";
-        const imgKey = el.dataset.imgkey || name;
 
         titleEl.textContent = name;
 
         priceEl.textContent = price;
         priceEl.style.display = price ? "block" : "none";
 
-        descEl.textContent = desc;
-        descEl.style.display = desc ? "block" : "none";
+        const lines = [];
+        if (desc) lines.push(desc);
+        if (allergen) lines.push(allergen);
+        descEl.textContent = lines.join("\n");
+        descEl.style.display = lines.length ? "block" : "none";
 
-        allergenEl.textContent = allergen;
-        allergenEl.style.display = allergen ? "block" : "none";
-
-        pairingEl.textContent = pairing;
+        pairingEl.textContent = pairing ? pairing : "";
         pairingEl.style.display = pairing ? "block" : "none";
-
-        // Modal image (bigger)
-        mediaEl.classList.remove('is-show');
-        modalImg.removeAttribute('src');
-        modalImg.alt = name;
-        const cand = guessImageCandidatesSmart(imgKey);
-        if(cand.length){
-          tryLoadImage(modalImg, cand, (ok) => {
-            if(ok){
-              mediaEl.classList.add('is-show');
-              mediaEl.setAttribute('aria-hidden','false');
-            }else{
-              mediaEl.classList.remove('is-show');
-              mediaEl.setAttribute('aria-hidden','true');
-            }
-          });
-        }
 
         modal.classList.add("is-open");
         modal.setAttribute("aria-hidden", "false");
