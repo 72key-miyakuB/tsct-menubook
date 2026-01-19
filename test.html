@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Sake Council Tokyo | Food Menu</title>
+  <meta name="description" content="The Sake Council Tokyo (TSCT) food menu. Wagyu Sake Shabu-shabu is our signature." />
+
+  <!-- Reset CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css" />
+
+  <!-- Google Font (EN headings) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Philosopher&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#0b0d12;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.09);
+      --line: rgba(255,255,255,.12);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --accent:#d7b56d;
+      --shadow: 0 18px 40px rgba(0,0,0,0.35);
+    }
+
+    body{
+      font-family: "Hiragino Kaku Gothic ProN","Hiragino Sans","BIZ UDPGothic",sans-serif;
+      line-height: 1.75;
+      background: radial-gradient(900px 600px at 20% 10%, rgba(215,181,109,.10), transparent 60%),
+                  radial-gradient(900px 600px at 80% 0%, rgba(255,255,255,.06), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+    }
+    a{ color: inherit; text-decoration: none; }
+
+    .wrapper{ max-width: 1120px; margin: 0 auto; padding: 0 1.25rem; }
+
+    /* Header */
+    .page-header{
+      padding: 1.0rem 0 0.75rem;
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(11,13,18,.65);
+    }
+    .page-header-inner{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .brand{
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      min-width: 0;
+    }
+    .logo{
+      width: 210px;
+      max-width: 44vw;
+      height: auto;
+      display: block;
+    }
+    .main-nav{
+      display: flex;
+      align-items: center;
+      gap: 1.0rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--muted);
+      white-space: nowrap;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .main-nav a{
+      padding: 0.35rem 0.15rem;
+      border-bottom: 2px solid transparent;
+    }
+    .main-nav a:hover{ color: var(--text); }
+    .main-nav a.is-current{ color: var(--text); border-bottom-color: var(--accent); }
+
+    .actions{
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .btn{
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 0.45rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      cursor: pointer;
+      transition: background .12s ease, transform .12s ease, border-color .12s ease;
+      user-select: none;
+    }
+    .btn:hover{
+      background: rgba(255,255,255,.12);
+      border-color: rgba(215,181,109,.35);
+      transform: translateY(-1px);
+    }
+    .btn.primary{
+      border-color: rgba(215,181,109,.55);
+      background: rgba(215,181,109,.14);
+      color: var(--text);
+    }
+
+    /* Page intro */
+    .page-title{
+      font-family: "Philosopher", serif;
+      font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+      letter-spacing: .02em;
+      margin: 1.35rem 0 0.35rem;
+    }
+    .page-subtitle{
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.25rem;
+    }
+    .page-subtitle .small{
+      display: block;
+      margin-top: .35rem;
+      font-size: 0.85rem;
+      opacity: .9;
+    }
+
+    /* Section + category */
+    .menu-section-title{
+      font-family: "Philosopher", serif;
+      font-size: 1.55rem;
+      margin: 2.0rem 0 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.65rem;
+    }
+    .menu-section-title .left{
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .menu-section-title .left::before{
+      content: "";
+      width: 10px;
+      height: 22px;
+      border-radius: 8px;
+      background: var(--accent);
+      opacity: .95;
+      display: inline-block;
+    }
+
+    .menu-category{ margin: 1.25rem 0 1.75rem; }
+    .menu-category-title{
+      font-size: 1.05rem;
+      color: var(--text);
+      margin: 0 0 0.6rem;
+      letter-spacing: .02em;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .menu-category-title::before{
+      content: "";
+      width: 8px;
+      height: 14px;
+      border-radius: 6px;
+      background: rgba(215,181,109,.9);
+      opacity: .9;
+      display: inline-block;
+    }
+
+    /* Cards grid */
+    .menu-grid{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+
+    .menu-item{
+      background: linear-gradient(180deg, var(--panel2), var(--panel));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0.85rem 0.9rem;
+      cursor: pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      box-shadow: 0 8px 22px rgba(0,0,0,.22);
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: .75rem;
+      align-items: center;
+      min-height: 94px;
+    }
+    .menu-item:hover{
+      transform: translateY(-2px);
+      border-color: rgba(215,181,109,.35);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+    }
+
+    .thumb{
+      width: 86px;
+      height: 64px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      overflow: hidden;
+      background: rgba(255,255,255,.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,.35);
+      font-size: .72rem;
+    }
+    .thumb img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .menu-name{
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .menu-price-small{
+      margin: 0.25rem 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .badge{
+      position: absolute;
+      top: 0.65rem;
+      right: 0.65rem;
+      font-size: 0.72rem;
+      padding: 0.18rem 0.45rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(215,181,109,.14);
+      color: var(--accent);
+      letter-spacing: .04em;
+    }
+
+    /* Signature highlight */
+    .menu-item.signature{
+      border-color: rgba(215,181,109,.35);
+      background: linear-gradient(180deg, rgba(215,181,109,.18), rgba(255,255,255,.05));
+    }
+    .menu-item.signature .menu-price-small{ color: rgba(255,255,255,.82); }
+
+    /* Footer */
+    .page-footer{
+      margin-top: 3rem;
+      padding: 2rem 0 1.5rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* Modal */
+    .modal-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.62);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 999;
+      padding: 1.0rem;
+    }
+    .modal-overlay.is-open{
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal{
+      max-width: 92vw;
+      width: 520px;
+      background: rgba(18,21,28,.96);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding: 1.15rem 1.25rem 1.25rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      color: var(--text);
+    }
+    .modal-title{
+      font-size: 1.15rem;
+      margin-bottom: 0.35rem;
+      letter-spacing: .02em;
+    }
+    .modal-price{
+      font-size: 0.95rem;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+    .modal-desc{
+      font-size: 0.92rem;
+      margin-bottom: 0.6rem;
+      color: rgba(255,255,255,.86);
+      white-space: pre-line;
+    }
+    .modal-pairing{
+      font-size: 0.88rem;
+      color: var(--muted);
+      border-top: 1px dashed rgba(255,255,255,.18);
+      padding-top: 0.6rem;
+      margin-top: 0.75rem;
+      white-space: pre-line;
+    }
+    .modal-close{
+      position: absolute;
+      top: 0.45rem;
+      right: 0.6rem;
+      border: none;
+      background: transparent;
+      font-size: 1.55rem;
+      line-height: 1;
+      cursor: pointer;
+      color: rgba(255,255,255,.78);
+    }
+    .modal-close:hover{ color: rgba(255,255,255,.95); }
+
+    /* Error box */
+    .error{
+      border: 1px solid rgba(255,127,127,.55);
+      background: rgba(255,127,127,.10);
+      border-radius: 14px;
+      padding: 1rem 1.1rem;
+      color: rgba(255,255,255,.92);
+    }
+    .error code{
+      display: block;
+      margin-top: .5rem;
+      padding: .5rem .6rem;
+      background: rgba(0,0,0,.35);
+      border-radius: 10px;
+      color: rgba(255,255,255,.85);
+      overflow-x: auto;
+    }
+
+    @media (min-width: 800px){
+      .menu-grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    /* ---- Mobile: 1 column + image on top, text below ---- */
+    @media (max-width: 560px){
+      .menu-grid{ grid-template-columns: 1fr; }
+      /* Signature should always be single column and prominent */
+      #signature-root.menu-grid{ grid-template-columns: 1fr; }
+
+      .menu-item{
+        grid-template-columns: 1fr;
+        gap: 0.7rem;
+        padding: 0.95rem;
+      }
+      .thumb{
+        width: 100%;
+        height: 160px;
+      }
+      .menu-price-small{ margin-top: 0.35rem; }
+    }
+    @media (max-width: 640px){
+      .page-header-inner{ flex-direction: column; align-items: center; }
+      .main-nav{ justify-content: center; }
+      .actions{ justify-content: center; }
+    }
+
+    /* ---- A4 print ---- */
+    @page { size: A4; margin: 12mm; }
+    @media print{
+      body{ background: #fff; color: #111; }
+      .page-header{ position: static; background: #fff; border-bottom: 1px solid #ddd; }
+      .main-nav, .actions{ display: none !important; }
+      .page-title, .page-subtitle{ color: #111; }
+      .menu-item{
+        box-shadow: none;
+        background: #fff;
+        border: 1px solid #ddd;
+        color: #111;
+      }
+      .menu-price-small{ color: #333; }
+      .badge{ color: #111; border-color: #bbb; background: #f5f5f5; }
+      .page-footer{ color: #333; border-top: 1px solid #ddd; }
+
+      /* ページ内の“中途半端な切れ”を減らす安全策 */
+      .menu-category{ break-inside: avoid; page-break-inside: avoid; }
+      .menu-category-title{ break-after: avoid; page-break-after: avoid; }
+      .menu-grid{ break-inside: avoid; page-break-inside: avoid; }
+      .menu-item{ break-inside: avoid; page-break-inside: avoid; }
+
+      /* モーダルは印刷しない */
+      .modal-overlay{ display: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="page-header">
+    <div class="wrapper page-header-inner">
+      <div class="brand">
+        <a href="menu_tsct_dynamic.html" aria-label="The Sake Council Tokyo">
+          <img class="logo" src="TSCT_logo_sample.PNG" alt="The Sake Council Tokyo" />
+        </a>
+      </div>
+
+      <nav aria-label="Primary">
+        <ul class="main-nav">
+          <li><a href="#signature" class="is-current">Menu</a></li>
+          <li><a href="#signature">Signature</a></li>
+          <li><a href="#food">Food</a></li>
+          <li><a href="#dessert">Dessert</a></li>
+        </ul>
+      </nav>
+
+      <div class="actions">
+        <button class="btn" id="lang-toggle" type="button">EN</button>
+        <button class="btn primary" type="button" onclick="window.print()">A4 Print</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrapper">
+    <h1 class="page-title" id="page-title">Food Menu</h1>
+    <p class="page-subtitle" id="page-subtitle">
+      仕入れ・季節により内容は変更になる場合がございます。<br />
+      価格・アレルギーなど詳細はスタッフまで。
+      <span class="small">Data source: <code>cooking_menu_list_tsct.csv</code></span>
+    </p>
+
+    <section id="signature">
+      <div class="menu-section-title"><span class="left" id="sig-title">Signature</span></div>
+      <div class="menu-grid" id="signature-root"></div>
+    </section>
+
+    <section id="food">
+      <div class="menu-section-title"><span class="left" id="food-title">Food</span></div>
+      <div id="food-root"></div>
+    </section>
+
+    <section id="dessert">
+      <div class="menu-section-title"><span class="left" id="dessert-title">Dessert</span></div>
+      <div id="dessert-root"></div>
+    </section>
+
+    <div id="error-root" style="margin-top:1.25rem;"></div>
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="item-modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" type="button" aria-label="Close">&times;</button>
+      <h3 class="modal-title" id="modal-title"></h3>
+      <p class="modal-price" id="modal-price"></p>
+      <p class="modal-desc" id="modal-desc"></p>
+      <p class="modal-pairing" id="modal-pairing"></p>
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    <div class="wrapper">
+      <p>The Sake Council Tokyo</p>
+      <p>&copy; TSCT All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // =====================================================
+    // Config
+    // =====================================================
+    const CSV_FILE = "cooking_menu_list_tsct.csv"; // <- 同じ階層
+    const IMAGES_DIR = "images"; // <- 同じ階層の images/
+    const IMAGE_EXTS = ["png", "jpg", "jpeg", "webp"]; // 探す拡張子順
+
+    // CSV columns (JP / EN)
+    const COL = {
+      nameJP: "メニュー名",
+      nameEN: "メニュー名_EN",
+      catJP: "カテゴリー",
+      catEN: "カテゴリー_EN",
+      price: "価格(税別,円)",
+      descJP: "テイスティングコメント",
+      descEN: "テイスティングコメント_EN",
+      pairingJP: "ペアリングドリンク",
+      pairingEN: "ペアリングドリンク_EN",
+      allergenJP: "アレルゲン",
+      allergenEN: "アレルゲン_EN",
+      stock: "在庫",
+    };
+
+    const CATEGORY_ORDER_JP = [
+      "看板メニュー","チーズ料理","フルーツ料理","味噌発酵料理","居酒屋料理","魚料理","食事","デザート","その他"
+    ];
+    const CATEGORY_ORDER_EN = [
+      "Signature","Cheese","Fruit","Miso & Fermentation","Izakaya Classics","Seafood","Rice & Sushi","Dessert","Others"
+    ];
+
+    // =====================================================
+    // Utilities
+    // =====================================================
+    function esc(s){
+      return String(s ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // Simple CSV parser (handles quoted fields)
+    function parseCSV(text){
+      const rows = [];
+      let row = [];
+      let cur = "";
+      let inQuotes = false;
+
+      // Normalize newlines
+      text = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+      for (let i=0; i<text.length; i++){
+        const c = text[i];
+        const n = text[i+1];
+
+        if (inQuotes){
+          if (c === '"' && n === '"'){ // escaped quote
+            cur += '"';
+            i++;
+          } else if (c === '"'){
+            inQuotes = false;
+          } else {
+            cur += c;
+          }
+        } else {
+          if (c === '"'){
+            inQuotes = true;
+          } else if (c === ","){
+            row.push(cur);
+            cur = "";
+          } else if (c === "\n"){
+            row.push(cur);
+            rows.push(row);
+            row = [];
+            cur = "";
+          } else {
+            cur += c;
+          }
+        }
+      }
+      // last
+      if (cur.length || row.length){
+        row.push(cur);
+        rows.push(row);
+      }
+
+      const header = rows.shift() || [];
+      const out = [];
+      for (const r of rows){
+        if (r.length === 1 && r[0] === "") continue;
+        const obj = {};
+        header.forEach((h, idx) => obj[h] = (r[idx] ?? ""));
+        out.push(obj);
+      }
+      return out;
+    }
+
+    function formatPrice(priceRaw, lang){
+      const p = String(priceRaw ?? "").trim();
+      if (!p) return "";
+      // numeric? -> format with commas
+      const num = Number(p.replace(/,/g, ""));
+      const nice = Number.isFinite(num) ? num.toLocaleString("ja-JP") : p;
+      return (lang === "en") ? `¥${nice} (excl. tax)` : `¥${nice}（税別）`;
+    }
+
+    function getLang(){
+      const url = new URL(location.href);
+      const q = (url.searchParams.get("lang") || "").toLowerCase();
+      if (q === "en" || q === "jp") return q;
+      const saved = localStorage.getItem("tsct_lang");
+      return (saved === "en" || saved === "jp") ? saved : "jp";
+    }
+    function setLang(lang){
+      localStorage.setItem("tsct_lang", lang);
+      const url = new URL(location.href);
+      url.searchParams.set("lang", lang);
+      history.replaceState(null, "", url.toString());
+    }
+
+    function isInStock(row){
+      const v = String(row[COL.stock] ?? "").trim();
+      // empty = treat as available? -> safer to show only "あり"
+      return v === "あり";
+    }
+
+    function pick(row, jpCol, enCol, lang){
+      const jp = String(row[jpCol] ?? "").trim();
+      const en = String(row[enCol] ?? "").trim();
+      if (lang === "en") return en || jp;
+      return jp || en;
+    }
+
+    // Create <img> with fallback extensions
+    function buildThumb(menuName){
+      const wrap = document.createElement("div");
+      wrap.className = "thumb";
+
+      const img = document.createElement("img");
+      img.alt = menuName;
+
+      const candidates = [];
+      // user expectation: images/{メニュー名}.png
+      for (const ext of IMAGE_EXTS){
+        candidates.push(`${IMAGES_DIR}/${encodeURIComponent(menuName)}.${ext}`);
+      }
+      // additional: food- prefix (optional)
+      for (const ext of IMAGE_EXTS){
+        candidates.push(`${IMAGES_DIR}/food-${encodeURIComponent(menuName)}.${ext}`);
+      }
+
+      let idx = 0;
+      const tryNext = () => {
+        if (idx >= candidates.length){
+          // fallback text
+          wrap.textContent = "No Image";
+          return;
+        }
+        img.src = candidates[idx++];
+      };
+
+      img.onerror = () => tryNext();
+      img.onload = () => {
+        // ok
+        wrap.textContent = "";
+        wrap.appendChild(img);
+      };
+
+      tryNext();
+      return wrap;
+    }
+
+    function renderItemCard(item){
+      const card = document.createElement("div");
+      card.className = "menu-item" + (item.isSignature ? " signature" : "");
+      card.setAttribute("role", "button");
+      card.setAttribute("tabindex", "0");
+
+      if (item.badge){
+        const b = document.createElement("span");
+        b.className = "badge";
+        b.textContent = item.badge;
+        card.appendChild(b);
+      }
+
+      const thumb = buildThumb(item.nameForImage);
+      card.appendChild(thumb);
+
+      const right = document.createElement("div");
+      right.className = "menu-text";
+
+      const nameP = document.createElement("p");
+      nameP.className = "menu-name";
+      nameP.textContent = item.name;
+      right.appendChild(nameP);
+
+      if (item.priceText){
+        const priceP = document.createElement("p");
+        priceP.className = "menu-price-small";
+        priceP.textContent = item.priceText;
+        right.appendChild(priceP);
+      }
+
+      card.appendChild(right);
+
+      // dataset for modal
+      card.dataset.name = item.name;
+      card.dataset.price = item.priceText || "";
+      card.dataset.desc = item.desc || "";
+      card.dataset.pairing = item.pairing || "";
+      card.dataset.allergen = item.allergen || "";
+      card.dataset.badge = item.badge || "";
+
+      return card;
+    }
+
+    function renderCategoryBlock(title, items){
+      const section = document.createElement("section");
+      section.className = "menu-category";
+
+      const h3 = document.createElement("h3");
+      h3.className = "menu-category-title";
+      h3.textContent = title;
+      section.appendChild(h3);
+
+      const grid = document.createElement("div");
+      grid.className = "menu-grid";
+      for (const it of items){
+        grid.appendChild(renderItemCard(it));
+      }
+      section.appendChild(grid);
+      return section;
+    }
+
+    // =====================================================
+    // Modal
+    // =====================================================
+    function setupModal(){
+      const modal = document.getElementById("item-modal");
+      const titleEl = document.getElementById("modal-title");
+      const priceEl = document.getElementById("modal-price");
+      const descEl = document.getElementById("modal-desc");
+      const pairingEl = document.getElementById("modal-pairing");
+      const closeBtn = modal.querySelector(".modal-close");
+
+      function openModal(el){
+        const name = el.dataset.name || "";
+        const price = el.dataset.price || "";
+        const desc = el.dataset.desc || "";
+        const pairing = el.dataset.pairing || "";
+        const allergen = el.dataset.allergen || "";
+
+        titleEl.textContent = name;
+
+        priceEl.textContent = price;
+        priceEl.style.display = price ? "block" : "none";
+
+        const lines = [];
+        if (desc) lines.push(desc);
+        if (allergen) lines.push(allergen);
+        descEl.textContent = lines.join("\n");
+        descEl.style.display = lines.length ? "block" : "none";
+
+        pairingEl.textContent = pairing ? pairing : "";
+        pairingEl.style.display = pairing ? "block" : "none";
+
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeModal(){
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+      }
+
+      document.addEventListener("click", (e) => {
+        const card = e.target.closest(".menu-item");
+        if (card) openModal(card);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        const focused = document.activeElement;
+        if ((e.key === "Enter" || e.key === " ") && focused && focused.classList && focused.classList.contains("menu-item")){
+          e.preventDefault();
+          openModal(focused);
+        }
+        if (e.key === "Escape") closeModal();
+      });
+
+      closeBtn.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+    }
+
+    // =====================================================
+    // Boot
+    // =====================================================
+    async function boot(){
+      const lang = getLang(); // "jp" | "en"
+      const toggle = document.getElementById("lang-toggle");
+      toggle.textContent = (lang === "en") ? "JP" : "EN";
+
+      // Titles/subtitles
+      document.getElementById("page-title").textContent = (lang === "en") ? "Food Menu" : "お料理メニュー";
+      document.getElementById("sig-title").textContent = (lang === "en") ? "Signature" : "看板";
+      document.getElementById("food-title").textContent = (lang === "en") ? "Food" : "お料理";
+      document.getElementById("dessert-title").textContent = (lang === "en") ? "Dessert" : "デザート";
+
+      // Load CSV
+      let text = "";
+      try{
+        const res = await fetch(CSV_FILE, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        text = await res.text();
+      } catch (err){
+        const er = document.getElementById("error-root");
+        er.innerHTML = `
+          <div class="error">
+            <div><b>CSV が読み込めませんでした。</b> Live Server で開いているか、ファイル名が一致しているか確認してください。</div>
+            <code>
+- このHTMLと同じ階層に: ${esc(CSV_FILE)}
+- 画像フォルダ: ${esc(IMAGES_DIR)}/
+- 例: http://127.0.0.1:5501/menu_tsct_dynamic.html
+            </code>
+            <div style="margin-top:.5rem; opacity:.9;">詳細: ${esc(String(err))}</div>
+          </div>
+        `;
+        return;
+      }
+
+      const rows = parseCSV(text);
+
+      // Build items from rows
+      const items = rows
+        .filter(r => (r[COL.nameJP] || r[COL.nameEN]) && isInStock(r))
+        .map(r => {
+          const name = pick(r, COL.nameJP, COL.nameEN, lang);
+          const nameForImage = String(r[COL.nameJP] ?? "").trim() || String(r[COL.nameEN] ?? "").trim() || name; // images are likely JP filenames
+          const category = pick(r, COL.catJP, COL.catEN, lang);
+          const rawPrice = String(r[COL.price] ?? "").trim();
+          const priceText = formatPrice(rawPrice, lang);
+
+          const desc = pick(r, COL.descJP, COL.descEN, lang);
+          const pairingRaw = pick(r, COL.pairingJP, COL.pairingEN, lang);
+          const pairing = pairingRaw ? ((lang === "en") ? `Pairing: ${pairingRaw}` : `おすすめペアリング：${pairingRaw}`) : "";
+
+          const allergenRaw = pick(r, COL.allergenJP, COL.allergenEN, lang);
+          const allergen = allergenRaw ? ((lang === "en") ? `Allergens: ${allergenRaw}` : `アレルゲン：${allergenRaw}`) : "";
+
+          // signature?
+          const catJP = String(r[COL.catJP] ?? "").trim();
+          const catEN = String(r[COL.catEN] ?? "").trim();
+          const isSignature = (catJP === "看板メニュー" || catEN === "Signature");
+          const isDessert = (catJP === "デザート" || catEN === "Dessert");
+
+          return {
+            name, nameForImage, category,
+            catJP, catEN,
+            isSignature, isDessert,
+            priceText,
+            desc,
+            pairing,
+            allergen,
+            badge: isSignature ? (lang === "en" ? "SIGNATURE" : "看板") : ""
+          };
+        });
+
+      // Split sections
+      const signatureItems = items.filter(i => i.isSignature);
+      const dessertItems = items.filter(i => i.isDessert && !i.isSignature);
+      const foodItems = items.filter(i => !i.isDessert && !i.isSignature);
+
+      // Order categories
+      function orderCats(items, lang){
+        const order = (lang === "en") ? CATEGORY_ORDER_EN : CATEGORY_ORDER_JP;
+        const key = (lang === "en") ? "category" : "category";
+        const unique = [];
+        for (const it of items){
+          const c = it[key] || (lang === "en" ? it.catEN : it.catJP) || (lang === "en" ? "Others" : "その他");
+          if (!unique.includes(c)) unique.push(c);
+        }
+        // first ordered, then remaining
+        const ordered = order.filter(o => unique.includes(o)).concat(unique.filter(u => !order.includes(u)));
+        return ordered;
+      }
+
+      // Render
+      const sigRoot = document.getElementById("signature-root");
+      sigRoot.innerHTML = "";
+      signatureItems.forEach(it => sigRoot.appendChild(renderItemCard(it)));
+
+      const dessertRoot = document.getElementById("dessert-root");
+      dessertRoot.innerHTML = "";
+      if (dessertItems.length){
+        const cats = orderCats(dessertItems, lang);
+        for (const cat of cats){
+          const group = dessertItems.filter(i => i.category === cat);
+          if (!group.length) continue;
+          dessertRoot.appendChild(renderCategoryBlock(cat, group));
+        }
+      }
+
+      const foodRoot = document.getElementById("food-root");
+      foodRoot.innerHTML = "";
+      if (foodItems.length){
+        const cats = orderCats(foodItems, lang);
+        for (const cat of cats){
+          const group = foodItems.filter(i => i.category === cat);
+          if (!group.length) continue;
+          foodRoot.appendChild(renderCategoryBlock(cat, group));
+        }
+      }
+
+      // Bind lang toggle (reload)
+      toggle.onclick = () => {
+        const next = (getLang() === "en") ? "jp" : "en";
+        setLang(next);
+        location.reload();
+      };
+
+      setupModal();
+    }
+
+    boot();
+  </script>
+</body>
+</html>
